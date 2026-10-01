@@ -1,19 +1,19 @@
 #pragma once
-#include "socl/Buffer.hpp"
+#include "vucol/Buffer.hpp"
 #include <cstdint>
-#include <socl/Context.hpp>
-#include <soclblas/ops/Axpy.hpp>
-#include <soclblas/ops/Operator.hpp>
+#include <vucol/Context.hpp>
+#include <vublas/ops/Axpy.hpp>
+#include <vublas/ops/Operator.hpp>
 
-namespace soclblas{
+namespace vublas{
     class AxpyOutPlaceFP32: public Operator{
         private:
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
         uint32_t thread_num;
 
         public:
         AxpyOutPlaceFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             uint32_t thread_num = 64
         );
         virtual DispatchPlan execute(

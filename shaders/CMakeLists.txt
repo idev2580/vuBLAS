@@ -1,7 +1,7 @@
 # Scan generated shader files
-find_program(SOCLBLAS_GLSLANG_VALIDATOR NAMES glslangValidator)
-if(NOT SOCLBLAS_GLSLANG_VALIDATOR)
-  message(FATAL_ERROR "glslangValidator is required to build soclBLAS")
+find_program(VUBLAS_GLSLANG_VALIDATOR NAMES glslangValidator)
+if(NOT VUBLAS_GLSLANG_VALIDATOR)
+  message(FATAL_ERROR "glslangValidator is required to build vuBLAS")
 endif()
 
 file(GLOB GEN_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/generated/*.comp")
@@ -38,7 +38,7 @@ foreach(SHADER_PATH IN LISTS ALL_SHADER_SOURCES)
 
   add_custom_command(
     OUTPUT "${SHADER_HEADER}"
-    COMMAND "${SOCLBLAS_GLSLANG_VALIDATOR}"
+    COMMAND "${VUBLAS_GLSLANG_VALIDATOR}"
             --target-env vulkan1.4
             "${SHADER_PATH}"
             -x
@@ -51,5 +51,5 @@ foreach(SHADER_PATH IN LISTS ALL_SHADER_SOURCES)
   list(APPEND SHADER_HEADERS ${SHADER_HEADER})
 endforeach()
 
-add_custom_target(soclblas_compile_shaders ALL DEPENDS ${SHADER_HEADERS})
+add_custom_target(vublas_compile_shaders ALL DEPENDS ${SHADER_HEADERS})
 set(SHADER_HEADERS ${SHADER_HEADERS} PARENT_SCOPE)

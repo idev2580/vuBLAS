@@ -141,7 +141,7 @@ layout( push_constant ) uniform constants {
     uint out_c_p_stride;
 } args;
 
-/*__SOCLBLAS_EPILOGUE__*/
+/*__VUBLAS_EPILOGUE__*/
 
 const uint shared_as_row_size = shared_tile_m_multiplier * subgroup_tile_m * reg_tile_m;
 const uint shared_as_col_size = shared_tile_n_multiplier * subgroup_tile_n * k_unroll;

@@ -1,13 +1,13 @@
 #pragma once
 #include <string_view>
 #include <vector>
-#include <soclblas/ops/Gemm.hpp>
+#include <vublas/ops/MatMul.hpp>
 
-namespace soclblas{
-    class GemmNaiveTemplateFP32: public Gemm{
+namespace vublas{
+    class MatMulNaiveTemplateFP32: public MatMul{
         private:
-        GemmNaiveTemplateFP32(
-            socl::Context& ctx,
+        MatMulNaiveTemplateFP32(
+            vucol::Context& ctx,
             std::vector<uint32_t> spirv,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
@@ -21,8 +21,8 @@ namespace soclblas{
         );
 
         public:
-        GemmNaiveTemplateFP32(
-            socl::Context& ctx,
+        MatMulNaiveTemplateFP32(
+            vucol::Context& ctx,
             std::string_view epilogueSource,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,

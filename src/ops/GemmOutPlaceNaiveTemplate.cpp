@@ -1,10 +1,10 @@
 #include "ShaderTemplate.hpp"
 #include "ShaderTemplates.hpp"
-#include <soclblas/ops/GemmOutPlaceNaiveTemplate.hpp>
+#include <vublas/ops/GemmOutPlaceNaiveTemplate.hpp>
 
-namespace soclblas{
+namespace vublas{
     GemmOutPlaceNaiveTemplateFP32::GemmOutPlaceNaiveTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::string_view epilogueSource,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
@@ -28,7 +28,7 @@ namespace soclblas{
     ){}
 
     GemmOutPlaceNaiveTemplateFP32::GemmOutPlaceNaiveTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::vector<uint32_t> spirv,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,

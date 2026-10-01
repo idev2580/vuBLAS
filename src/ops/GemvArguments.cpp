@@ -1,7 +1,7 @@
-#include "soclblas/ops/GemmArguments.hpp"
-#include <soclblas/ops/GemvArguments.hpp>
+#include "vublas/ops/GemmArguments.hpp"
+#include <vublas/ops/GemvArguments.hpp>
 
-namespace soclblas{
+namespace vublas{
     GemmArguments convertGemvToGemm(const GemvArguments& args){
         return {
             .b = 1,

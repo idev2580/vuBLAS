@@ -1,8 +1,8 @@
-#include <soclblas/ops/GemvOutPlaceNaiveTemplate.hpp>
+#include <vublas/ops/GemvOutPlaceNaiveTemplate.hpp>
 
-namespace soclblas{
+namespace vublas{
     GemvOutPlaceNaiveTemplateFP32::GemvOutPlaceNaiveTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::string_view epilogueSource,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,

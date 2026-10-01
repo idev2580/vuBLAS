@@ -1,13 +1,11 @@
 #pragma once
-#include <soclblas/ops/GemmOutPlaceNaiveTemplate.hpp>
-#include <soclblas/ops/GemvOutPlace.hpp>
+#include <vublas/ops/GemmOutPlace.hpp>
 
-namespace soclblas{
-    class GemvOutPlaceNaiveTemplateFP32: public GemvOutPlace{
+namespace vublas{
+    class GemmOutPlaceNaiveFP32: public GemmOutPlace{
         public:
-        GemvOutPlaceNaiveTemplateFP32(
-            socl::Context& ctx,
-            std::string_view epilogueSource,
+        GemmOutPlaceNaiveFP32(
+            vucol::Context& ctx,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
             uint32_t subgroup_tile_p,

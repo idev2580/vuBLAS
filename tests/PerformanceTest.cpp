@@ -9,15 +9,15 @@
 #include <string>
 #include <vector>
 
-#include <socl/Context.hpp>
-#include <soclblas/ExecutionPlan.hpp>
-#include <soclblas/ops/GemmNaive.hpp>
-#include <soclblas/ops/GemmOutPlaceNaive.hpp>
+#include <vucol/Context.hpp>
+#include <vublas/ExecutionPlan.hpp>
+#include <vublas/ops/GemmNaive.hpp>
+#include <vublas/ops/GemmOutPlaceNaive.hpp>
 /* Argument sweep targets
  *
- * Current best (Naive, iGPU case): ./build/soclblas_performance_tests --naive 16 4096 4096 4096 4 4 8 2 4 1 8 8 8 20
+ * Current best (Naive, iGPU case): ./build/vublas_performance_tests --naive 16 4096 4096 4096 4 4 8 2 4 1 8 8 8 20
 
- * Current best (Naive, dGPU case): ./build/soclblas_performance_tests --naive 16 4096 4096 4096 8 4 4 2 4 1 8 4 8 20
+ * Current best (Naive, dGPU case): ./build/vublas_performance_tests --naive 16 4096 4096 4096 8 4 4 2 4 1 8 4 8 20
   C tile       = 128×128
   shared N     = 16
   shared memory= 16 KiB
@@ -28,7 +28,7 @@
   = 128×128 / (2×256)
   = 32 FLOP/byte
 
-  Current best (Naive, dGPU case, by sweep): ./build/soclblas_performance_tests --naive 16 4096 4096 4096 1 1 32 4 2 4 16 1 4 20
+  Current best (Naive, dGPU case, by sweep): ./build/vublas_performance_tests --naive 16 4096 4096 4096 1 1 32 4 2 4 16 1 4 20
   - 256 threads
   - Small LDS
   - A broadcast
@@ -37,8 +37,8 @@
   - Large output tile for P direction
   
  * Subgroup/shared-memory kernels
- * ./build/soclblas_performance_tests --naive 8 4096 1024 1024 8 4 4 2 2 2 8 8 8 20
- * ./build/soclblas_performance_tests --naive-oop 8 4096 1024 1024 8 4 4 2 2 2 8 8 8 20
+ * ./build/vublas_performance_tests --naive 8 4096 1024 1024 8 4 4 2 2 2 8 8 8 20
+ * ./build/vublas_performance_tests --naive-oop 8 4096 1024 1024 8 4 4 2 2 2 8 8 8 20
  */
 namespace {
     constexpr int gpu_idx = 0;
@@ -355,11 +355,11 @@ namespace {
 
     template<typename DispatchFunction>
     double measure_dispatches(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         const GemmPerfConfig& config,
         DispatchFunction dispatch
     ) {
-        soclblas::ExecutionPlan executionPlan;
+        vublas::ExecutionPlan executionPlan;
         executionPlan.append(dispatch());
         
         for(uint32_t i = 0; i < warmup_iterations; i++) {
@@ -415,7 +415,7 @@ namespace {
         const uint32_t c_stride =
             checked_stride(config.m, config.p, "c_stride");
 
-        const soclblas::GemmArguments args = {
+        const vublas::GemmArguments args = {
             .b = config.batch,
             .m = config.m,
             .n = config.n,
@@ -433,10 +433,10 @@ namespace {
             .c_p_stride = 1
         };
 
-        socl::Context ctx({gpu_idx});
-        auto bufferA = ctx.createBuffer(a_bytes, socl::BufferType::Auto);
-        auto bufferB = ctx.createBuffer(b_bytes, socl::BufferType::Auto);
-        auto bufferC = ctx.createBuffer(c_bytes, socl::BufferType::Auto);
+        vucol::Context ctx({gpu_idx});
+        auto bufferA = ctx.createBuffer(a_bytes, vucol::BufferType::Auto);
+        auto bufferB = ctx.createBuffer(b_bytes, vucol::BufferType::Auto);
+        auto bufferC = ctx.createBuffer(c_bytes, vucol::BufferType::Auto);
 
         bufferA.write(a.data(), a_bytes);
         bufferB.write(b.data(), b_bytes);
@@ -444,13 +444,13 @@ namespace {
 
         if(out_of_place) {
             auto bufferOutC =
-                ctx.createBuffer(c_bytes, socl::BufferType::Auto);
+                ctx.createBuffer(c_bytes, vucol::BufferType::Auto);
             bufferOutC.write(out_c.data(), c_bytes);
 
-            const soclblas::GemmOutPlaceArguments out_args =
-                soclblas::GemmOutPlaceArguments::sameOutputLayout(args);
+            const vublas::GemmOutPlaceArguments out_args =
+                vublas::GemmOutPlaceArguments::sameOutputLayout(args);
 
-            soclblas::GemmOutPlaceNaiveFP32 gemm(
+            vublas::GemmOutPlaceNaiveFP32 gemm(
                 ctx,
                 config.tile_m,
                 config.tile_n,
@@ -475,7 +475,7 @@ namespace {
             return;
         }
 
-        soclblas::GemmNaiveFP32 gemm(
+        vublas::GemmNaiveFP32 gemm(
             ctx,
             config.tile_m,
             config.tile_n,

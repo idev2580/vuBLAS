@@ -1,13 +1,13 @@
 #pragma once
-#include "socl/Buffer.hpp"
-#include "socl/Context.hpp"
-#include <soclblas/ops/Gemm.hpp>
+#include <vublas/ops/GemmOutPlaceNaiveTemplate.hpp>
+#include <vublas/ops/GemvOutPlace.hpp>
 
-namespace soclblas{
-    class GemmNaiveFP32: public Gemm{
+namespace vublas{
+    class GemvOutPlaceNaiveTemplateFP32: public GemvOutPlace{
         public:
-        GemmNaiveFP32(
-            socl::Context& ctx,
+        GemvOutPlaceNaiveTemplateFP32(
+            vucol::Context& ctx,
+            std::string_view epilogueSource,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
             uint32_t subgroup_tile_p,

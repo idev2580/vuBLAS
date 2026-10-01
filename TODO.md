@@ -16,7 +16,7 @@ bindings that remain alive until GPU completion.
   contents.
 - One submission per operation prevents efficient chaining of GEMM,
   Elementwise, reductions, and future DNN operations.
-- socl has no public compute-to-compute barrier recording API.
+- vucol has no public compute-to-compute barrier recording API.
 - `Context::createDescriptorSet` currently creates a separate descriptor pool
   with `maxSets = 1` for every set, which is unsuitable for eager dispatches.
 - Command buffers do not retain all pipelines, descriptor sets, and buffers
@@ -54,12 +54,12 @@ enum class BufferAccess {
 
 struct BufferBinding {
     uint32_t binding;
-    socl::Buffer buffer;
+    vucol::Buffer buffer;
     BufferAccess access;
 };
 
 struct DispatchPlan {
-    socl::ShaderPipeline pipeline;
+    vucol::ShaderPipeline pipeline;
     std::vector<BufferBinding> bindings;
     std::vector<std::byte> pushConstants;
     uint32_t groupCountX;
@@ -136,7 +136,7 @@ Track the last access to each underlying buffer within the active batch.
 | Any | ReadWrite | Yes |
 
 Begin with a conservative global compute barrier between dependent dispatches.
-Later, narrow barriers to affected buffers if socl exposes buffer barriers.
+Later, narrow barriers to affected buffers if vucol exposes buffer barriers.
 Pipeline changes and descriptor bindings do not provide memory visibility by
 themselves.
 
@@ -157,7 +157,7 @@ the producing dispatch is still only recorded.
 
 ## Implementation Phases
 
-### 1. socl command recording
+### 1. vucol command recording
 
 - Add a compute-to-compute memory barrier API.
 - Introduce a command batch/encoder abstraction, or formally support repeated
@@ -172,7 +172,7 @@ the producing dispatch is still only recorded.
 - Grow pools in bounded blocks and flush or allocate another block on capacity
   exhaustion.
 
-### 3. soclBLAS plan API
+### 3. vuBLAS plan API
 
 - Add `BufferAccess`, `BufferBinding`, and `DispatchPlan` types.
 - Change operators to create plans without calling `begin` or `submitAsync`.

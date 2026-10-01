@@ -1,13 +1,13 @@
 #pragma once
 #include <string_view>
 #include <vector>
-#include <soclblas/ops/GemmOutPlace.hpp>
+#include <vublas/ops/GemmOutPlace.hpp>
 
-namespace soclblas{
+namespace vublas{
     class GemmOutPlaceNaiveTemplateFP32: public GemmOutPlace{
         private:
         GemmOutPlaceNaiveTemplateFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             std::vector<uint32_t> spirv,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
@@ -22,7 +22,7 @@ namespace soclblas{
 
         public:
         GemmOutPlaceNaiveTemplateFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             std::string_view epilogueSource,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,

@@ -1,24 +1,24 @@
-#include "socl/ShaderPipeline.hpp"
-#include <soclblas/ops/DotProductNaive.hpp>
+#include "vucol/ShaderPipeline.hpp"
+#include <vublas/ops/DotProductNaive.hpp>
 #include <DotProductNaiveFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     DotProductNaiveFP32::DotProductNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num,
         uint32_t values_per_thread
     ):thread_num(thread_num), values_per_thread(values_per_thread){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = DotProductNaiveFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
-                {2, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
+                {2, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(BinaryReductionArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
-                {1, socl::specConstant(std::uint32_t{values_per_thread})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
+                {1, vucol::specConstant(std::uint32_t{values_per_thread})},
             }
         });
     }
@@ -35,9 +35,9 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, inputs[1], socl::BufferAccess::Read},
-                {2, outputs[0], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, inputs[1], vucol::BufferAccess::Read},
+                {2, outputs[0], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = reductionArgs->b,

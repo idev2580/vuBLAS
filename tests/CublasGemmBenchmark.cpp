@@ -315,11 +315,11 @@ namespace {
             << ", m=" << config.m
             << ", n=" << config.n
             << ", p=" << config.p << "\n"
-            << "  socl_tile_m=" << config.tile_m
-            << ", socl_tile_n=" << config.tile_n
-            << ", socl_tile_p=" << config.tile_p << "\n"
-            << "  socl_thread_tile_m=" << config.thread_tile_m
-            << ", socl_thread_tile_p=" << config.thread_tile_p << "\n"
+            << "  vucol_tile_m=" << config.tile_m
+            << ", vucol_tile_n=" << config.tile_n
+            << ", vucol_tile_p=" << config.tile_p << "\n"
+            << "  vucol_thread_tile_m=" << config.thread_tile_m
+            << ", vucol_thread_tile_p=" << config.thread_tile_p << "\n"
             << "  warmup_iterations=" << config.warmup_iterations
             << ", measured_iterations=" << config.iterations << "\n";
     }

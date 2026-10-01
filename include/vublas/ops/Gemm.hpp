@@ -1,22 +1,27 @@
 #pragma once
-#include "socl/Buffer.hpp"
+#include "vucol/Buffer.hpp"
 #include <cstdint>
-#include <socl/Context.hpp>
-#include <soclblas/ops/Operator.hpp>
-#include <soclblas/ops/GemmArguments.hpp>
+#include <vucol/Context.hpp>
+#include <vublas/ops/Operator.hpp>
+#include <vublas/ops/GemmArguments.hpp>
 
-namespace soclblas{
-    class GemmOutPlace: public Operator{
+namespace vublas{
+    class Gemm: public Operator{
         private:
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
 
         uint32_t tile_m;
         uint32_t tile_n;
         uint32_t tile_p;
 
+        protected:
+        Gemm(
+            vucol::Context& ctx
+        );
+
         public:
-        GemmOutPlace(
-            socl::Context& ctx,
+        Gemm(
+            vucol::Context& ctx,
             std::span<const uint32_t> shaderBytecodes,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
@@ -40,14 +45,6 @@ namespace soclblas{
             BufferView A,
             BufferView B,
             BufferView C,
-            BufferView outC,
-            const GemmOutPlaceArguments& args
-        );
-        virtual DispatchPlan operator()(
-            BufferView A,
-            BufferView B,
-            BufferView C,
-            BufferView outC,
             const GemmArguments& args
         );
     };

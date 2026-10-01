@@ -1,18 +1,18 @@
 #pragma once
-#include "socl/Buffer.hpp"
-#include "socl/Context.hpp"
-#include <soclblas/ops/Reduction.hpp>
+#include "vucol/Buffer.hpp"
+#include "vucol/Context.hpp"
+#include <vublas/ops/Reduction.hpp>
 
-namespace soclblas{
+namespace vublas{
     class DotProductNaiveFP32:public BinaryReduction{
         private:
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
         uint32_t thread_num;
         uint32_t values_per_thread;
 
         public:
         DotProductNaiveFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             uint32_t thread_num = 32,
             uint32_t values_per_thread = 64
         );

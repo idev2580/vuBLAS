@@ -1,15 +1,15 @@
 #include "ShaderTemplate.hpp"
 #include "ShaderTemplates.hpp"
-#include <soclblas/ops/ElementWiseTemplate.hpp>
+#include <vublas/ops/ElementWiseTemplate.hpp>
 
-namespace soclblas{
+namespace vublas{
     namespace{
         constexpr std::string_view operationMarker =
-            "/*__SOCLBLAS_OPERATION__*/";
+            "/*__VUBLAS_OPERATION__*/";
     }
 
     UnaryElementwiseTemplateFP32::UnaryElementwiseTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::string_view operationSource,
         uint32_t thread_num
     ):UnaryElementwiseTemplateFP32(
@@ -24,19 +24,19 @@ namespace soclblas{
     ){}
 
     UnaryElementwiseTemplateFP32::UnaryElementwiseTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::vector<uint32_t> spirv,
         uint32_t thread_num
     ):thread_num(thread_num){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = spirv,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(UnaryElementwiseArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
             }
         });
     }
@@ -56,8 +56,8 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, outputs[0], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, outputs[0], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = groupCount,
@@ -84,7 +84,7 @@ namespace soclblas{
     }
 
     BinaryElementwiseTemplateFP32::BinaryElementwiseTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::string_view operationSource,
         uint32_t thread_num
     ):BinaryElementwiseTemplateFP32(
@@ -99,20 +99,20 @@ namespace soclblas{
     ){}
 
     BinaryElementwiseTemplateFP32::BinaryElementwiseTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::vector<uint32_t> spirv,
         uint32_t thread_num
     ):thread_num(thread_num){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = spirv,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
-                {2, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
+                {2, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(BinaryElementwiseArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
             }
         });
     }
@@ -132,9 +132,9 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, inputs[1], socl::BufferAccess::Read},
-                {2, outputs[0], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, inputs[1], vucol::BufferAccess::Read},
+                {2, outputs[0], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = groupCount,

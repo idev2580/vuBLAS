@@ -1,25 +1,25 @@
 #pragma once
-#include <soclblas/ops/ElementWise.hpp>
+#include <vublas/ops/ElementWise.hpp>
 
 #include <cstdint>
 #include <string_view>
 #include <vector>
 
-namespace soclblas{
+namespace vublas{
     class UnaryElementwiseTemplateFP32: public UnaryElementwise{
         private:
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
         uint32_t thread_num;
 
         UnaryElementwiseTemplateFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             std::vector<uint32_t> spirv,
             uint32_t thread_num
         );
 
         public:
         UnaryElementwiseTemplateFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             std::string_view operationSource,
             uint32_t thread_num = 64
         );
@@ -41,18 +41,18 @@ namespace soclblas{
 
     class BinaryElementwiseTemplateFP32: public BinaryElementwise{
         private:
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
         uint32_t thread_num;
 
         BinaryElementwiseTemplateFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             std::vector<uint32_t> spirv,
             uint32_t thread_num
         );
 
         public:
         BinaryElementwiseTemplateFP32(
-            socl::Context& ctx,
+            vucol::Context& ctx,
             std::string_view operationSource,
             uint32_t thread_num = 64
         );

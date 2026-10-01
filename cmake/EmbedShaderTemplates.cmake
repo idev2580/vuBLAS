@@ -16,7 +16,7 @@ format_byte_array("${GEMM_OUT_PLACE_TEMPLATE_HEX}" GEMM_OUT_PLACE_TEMPLATE_BYTES
 format_byte_array("${UNARY_ELEMENTWISE_TEMPLATE_HEX}" UNARY_ELEMENTWISE_TEMPLATE_BYTES)
 format_byte_array("${BINARY_ELEMENTWISE_TEMPLATE_HEX}" BINARY_ELEMENTWISE_TEMPLATE_BYTES)
 
-file(WRITE "${OUTPUT_FILE}" "#include <cstddef>\n#include <string_view>\n\nnamespace soclblas::detail{\n")
+file(WRITE "${OUTPUT_FILE}" "#include <cstddef>\n#include <string_view>\n\nnamespace vublas::detail{\n")
 file(APPEND "${OUTPUT_FILE}" "namespace{\nconst unsigned char gemm_naive_template[] = {${GEMM_TEMPLATE_BYTES}};\n")
 file(APPEND "${OUTPUT_FILE}" "const unsigned char matmul_naive_template[] = {${MATMUL_TEMPLATE_BYTES}};\n")
 file(APPEND "${OUTPUT_FILE}" "const unsigned char gemm_out_place_naive_template[] = {${GEMM_OUT_PLACE_TEMPLATE_BYTES}};\n")

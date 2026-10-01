@@ -3,21 +3,21 @@
 #include <cstddef>
 #include <utility>
 
-#include <socl/Buffer.hpp>
+#include <vucol/Buffer.hpp>
 
-namespace soclblas{
+namespace vublas{
     struct BufferView{
-        socl::Buffer buffer;
+        vucol::Buffer buffer;
         std::size_t offset;
         std::size_t size;
 
-        BufferView(socl::Buffer buffer)
+        BufferView(vucol::Buffer buffer)
             : buffer(std::move(buffer)),
               offset(0),
               size(this->buffer.size()){
         }
 
-        BufferView(socl::Buffer buffer, std::size_t offset, std::size_t size)
+        BufferView(vucol::Buffer buffer, std::size_t offset, std::size_t size)
             : buffer(std::move(buffer)), offset(offset), size(size){
         }
     };

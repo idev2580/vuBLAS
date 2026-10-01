@@ -1,10 +1,10 @@
-#include <soclblas/ops/GemvOutPlaceNaive.hpp>
-#include <soclblas/ops/GemmOutPlaceNaive.hpp>
+#include <vublas/ops/GemvOutPlaceNaive.hpp>
+#include <vublas/ops/GemmOutPlaceNaive.hpp>
 #include <memory>
 
-namespace soclblas{
+namespace vublas{
     GemvOutPlaceNaiveFP32::GemvOutPlaceNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
         uint32_t subgroup_tile_p,

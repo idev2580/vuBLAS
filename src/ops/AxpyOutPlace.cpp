@@ -1,8 +1,8 @@
-#include "socl/ShaderPipeline.hpp"
-#include <soclblas/ops/AxpyOutPlace.hpp>
+#include "vucol/ShaderPipeline.hpp"
+#include <vublas/ops/AxpyOutPlace.hpp>
 #include <AxpyOutPlaceFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     AxpyOutPlaceArguments AxpyOutPlaceArguments::sameOutputLayout(const AxpyArguments& args){
         return {
             .b = args.b,
@@ -22,19 +22,19 @@ namespace soclblas{
     }
 
     AxpyOutPlaceFP32::AxpyOutPlaceFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num
     ):thread_num(thread_num){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = AxpyOutPlaceFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
-                {2, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
+                {2, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(AxpyOutPlaceArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
             }
         });
     }
@@ -52,9 +52,9 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, inputs[1], socl::BufferAccess::Read},
-                {2, outputs[0], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, inputs[1], vucol::BufferAccess::Read},
+                {2, outputs[0], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = axpyArgs->b,

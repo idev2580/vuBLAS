@@ -1,10 +1,10 @@
-#include <soclblas/ops/GemvNaive.hpp>
-#include <soclblas/ops/GemmNaive.hpp>
+#include <vublas/ops/GemvNaive.hpp>
+#include <vublas/ops/GemmNaive.hpp>
 #include <memory>
 
-namespace soclblas{
+namespace vublas{
     GemvNaiveFP32::GemvNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
         uint32_t subgroup_tile_p,

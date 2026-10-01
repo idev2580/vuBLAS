@@ -1,0 +1,8 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(VUCOL CONFIG REQUIRED HINTS "${PACKAGE_PREFIX_DIR}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/vuBLASTargets.cmake")
+
+check_required_components(vuBLAS)

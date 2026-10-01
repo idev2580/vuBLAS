@@ -1,27 +1,27 @@
-#include "socl/ShaderPipeline.hpp"
-#include <soclblas/ops/ReductionNaive.hpp>
+#include "vucol/ShaderPipeline.hpp"
+#include <vublas/ops/ReductionNaive.hpp>
 #include <AvgNaiveFP32_SPIRV>
 #include <MaxNaiveFP32_SPIRV>
 #include <MinNaiveFP32_SPIRV>
 #include <SumNaiveFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     MaxNaiveFP32::MaxNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num,
         uint32_t values_per_thread
     ):thread_num(thread_num), values_per_thread(values_per_thread){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = MaxNaiveFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
-                {2, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
+                {2, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(IndexedUnaryReductionArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
-                {1, socl::specConstant(std::uint32_t{values_per_thread})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
+                {1, vucol::specConstant(std::uint32_t{values_per_thread})},
             }
         });
     }
@@ -38,9 +38,9 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, outputs[0], socl::BufferAccess::Write},
-                {2, outputs[1], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, outputs[0], vucol::BufferAccess::Write},
+                {2, outputs[1], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = reductionArgs->b,
@@ -68,21 +68,21 @@ namespace soclblas{
     }
 
     MinNaiveFP32::MinNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num,
         uint32_t values_per_thread
     ):thread_num(thread_num), values_per_thread(values_per_thread){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = MinNaiveFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
-                {2, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
+                {2, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(IndexedUnaryReductionArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
-                {1, socl::specConstant(std::uint32_t{values_per_thread})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
+                {1, vucol::specConstant(std::uint32_t{values_per_thread})},
             }
         });
     }
@@ -99,9 +99,9 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, outputs[0], socl::BufferAccess::Write},
-                {2, outputs[1], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, outputs[0], vucol::BufferAccess::Write},
+                {2, outputs[1], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = reductionArgs->b,
@@ -129,20 +129,20 @@ namespace soclblas{
     }
 
     AvgNaiveFP32::AvgNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num,
         uint32_t values_per_thread
     ):thread_num(thread_num), values_per_thread(values_per_thread){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = AvgNaiveFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(UnaryReductionArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
-                {1, socl::specConstant(std::uint32_t{values_per_thread})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
+                {1, vucol::specConstant(std::uint32_t{values_per_thread})},
             }
         });
     }
@@ -159,8 +159,8 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, outputs[0], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, outputs[0], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = reductionArgs->b,
@@ -181,20 +181,20 @@ namespace soclblas{
     }
 
     SumNaiveFP32::SumNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num,
         uint32_t values_per_thread
     ):thread_num(thread_num), values_per_thread(values_per_thread){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = SumNaiveFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(UnaryReductionArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
-                {1, socl::specConstant(std::uint32_t{values_per_thread})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
+                {1, vucol::specConstant(std::uint32_t{values_per_thread})},
             }
         });
     }
@@ -211,8 +211,8 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, outputs[0], socl::BufferAccess::Write},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, outputs[0], vucol::BufferAccess::Write},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = reductionArgs->b,

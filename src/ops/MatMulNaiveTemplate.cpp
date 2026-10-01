@@ -1,10 +1,10 @@
 #include "ShaderTemplate.hpp"
 #include "ShaderTemplates.hpp"
-#include <soclblas/ops/MatMulNaiveTemplate.hpp>
+#include <vublas/ops/MatMulNaiveTemplate.hpp>
 
-namespace soclblas{
+namespace vublas{
     MatMulNaiveTemplateFP32::MatMulNaiveTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::string_view epilogueSource,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
@@ -34,7 +34,7 @@ namespace soclblas{
     ){}
 
     MatMulNaiveTemplateFP32::MatMulNaiveTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::vector<uint32_t> spirv,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,

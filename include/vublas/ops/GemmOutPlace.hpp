@@ -1,37 +1,22 @@
 #pragma once
-#include "socl/Buffer.hpp"
+#include "vucol/Buffer.hpp"
 #include <cstdint>
-#include <socl/Context.hpp>
-#include <soclblas/ops/Operator.hpp>
+#include <vucol/Context.hpp>
+#include <vublas/ops/Operator.hpp>
+#include <vublas/ops/GemmArguments.hpp>
 
-namespace soclblas{
-    struct MatMulArguments{
-        uint32_t b;
-        uint32_t m;
-        uint32_t n;
-        uint32_t p;
-        uint32_t a_stride;
-        uint32_t b_stride;
-        uint32_t c_stride;
-        uint32_t a_m_stride;
-        uint32_t a_n_stride;
-        uint32_t b_n_stride;
-        uint32_t b_p_stride;
-        uint32_t c_m_stride;
-        uint32_t c_p_stride;
-    };
-
-    class MatMul: public Operator{
+namespace vublas{
+    class GemmOutPlace: public Operator{
         private:
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
 
         uint32_t tile_m;
         uint32_t tile_n;
         uint32_t tile_p;
 
         public:
-        MatMul(
-            socl::Context& ctx,
+        GemmOutPlace(
+            vucol::Context& ctx,
             std::span<const uint32_t> shaderBytecodes,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
@@ -55,7 +40,15 @@ namespace soclblas{
             BufferView A,
             BufferView B,
             BufferView C,
-            const MatMulArguments& args
+            BufferView outC,
+            const GemmOutPlaceArguments& args
+        );
+        virtual DispatchPlan operator()(
+            BufferView A,
+            BufferView B,
+            BufferView C,
+            BufferView outC,
+            const GemmArguments& args
         );
     };
 }

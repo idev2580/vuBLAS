@@ -1,11 +1,13 @@
 #pragma once
-#include <soclblas/ops/GemmOutPlace.hpp>
+#include "vucol/Buffer.hpp"
+#include "vucol/Context.hpp"
+#include <vublas/ops/MatMul.hpp>
 
-namespace soclblas{
-    class GemmOutPlaceNaiveFP32: public GemmOutPlace{
+namespace vublas{
+    class MatMulNaiveFP32: public MatMul{
         public:
-        GemmOutPlaceNaiveFP32(
-            socl::Context& ctx,
+        MatMulNaiveFP32(
+            vucol::Context& ctx,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
             uint32_t subgroup_tile_p,

@@ -1,13 +1,13 @@
-#include "socl/ShaderPipeline.hpp"
-#include <soclblas/ops/Gemm.hpp>
+#include "vucol/ShaderPipeline.hpp"
+#include <vublas/ops/Gemm.hpp>
 
-namespace soclblas{
+namespace vublas{
     Gemm::Gemm(
-        socl::Context& ctx
+        vucol::Context& ctx
     ):tile_m(1), tile_n(1), tile_p(1){}
 
     Gemm::Gemm(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::span<const uint32_t> shaderBytecodes,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
@@ -30,23 +30,23 @@ namespace soclblas{
         this->pipeline = ctx.createShaderPipeline({
             .spirv = shaderBytecodes,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
-                {2, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
+                {2, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(GemmArguments),
             .specConstants = {
-                {0, socl::specConstant(shared_tile_n_multiplier)},
-                {1, socl::specConstant(subgroup_tile_cnt_m)},
-                {2, socl::specConstant(subgroup_tile_cnt_p)},
-                {3, socl::specConstant(subgroup_tile_m)},
-                {4, socl::specConstant(subgroup_tile_n)},
-                {5, socl::specConstant(subgroup_tile_p)},
-                {6, socl::specConstant(threadgroup_tile_m)},
-                {7, socl::specConstant(threadgroup_tile_p)},
-                {8, socl::specConstant(reg_tile_m)},
-                {9, socl::specConstant(inner_tile_n)},
-                {10, socl::specConstant(reg_tile_p)}
+                {0, vucol::specConstant(shared_tile_n_multiplier)},
+                {1, vucol::specConstant(subgroup_tile_cnt_m)},
+                {2, vucol::specConstant(subgroup_tile_cnt_p)},
+                {3, vucol::specConstant(subgroup_tile_m)},
+                {4, vucol::specConstant(subgroup_tile_n)},
+                {5, vucol::specConstant(subgroup_tile_p)},
+                {6, vucol::specConstant(threadgroup_tile_m)},
+                {7, vucol::specConstant(threadgroup_tile_p)},
+                {8, vucol::specConstant(reg_tile_m)},
+                {9, vucol::specConstant(inner_tile_n)},
+                {10, vucol::specConstant(reg_tile_p)}
             },
             .requiredSubgroupSize = 32,
         });
@@ -66,9 +66,9 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, inputs[1], socl::BufferAccess::Read},
-                {2, inouts[0], socl::BufferAccess::ReadWrite},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, inputs[1], vucol::BufferAccess::Read},
+                {2, inouts[0], vucol::BufferAccess::ReadWrite},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = gemmArgs->b,

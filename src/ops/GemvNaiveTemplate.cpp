@@ -1,8 +1,8 @@
-#include <soclblas/ops/GemvNaiveTemplate.hpp>
+#include <vublas/ops/GemvNaiveTemplate.hpp>
 
-namespace soclblas{
+namespace vublas{
     GemvNaiveTemplateFP32::GemvNaiveTemplateFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         std::string_view epilogueSource,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,

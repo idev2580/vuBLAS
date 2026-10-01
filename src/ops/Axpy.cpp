@@ -1,21 +1,21 @@
-#include "socl/ShaderPipeline.hpp"
-#include <soclblas/ops/Axpy.hpp>
+#include "vucol/ShaderPipeline.hpp"
+#include <vublas/ops/Axpy.hpp>
 #include <AxpyFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     AxpyFP32::AxpyFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t thread_num
     ):thread_num(thread_num){
         this->pipeline = ctx.createShaderPipeline({
             .spirv = AxpyFP32_SPIRV,
             .bindings = {
-                {0, socl::DescriptorType::StorageBuffer},
-                {1, socl::DescriptorType::StorageBuffer},
+                {0, vucol::DescriptorType::StorageBuffer},
+                {1, vucol::DescriptorType::StorageBuffer},
             },
             .pushConstantSize = sizeof(AxpyArguments),
             .specConstants = {
-                {0, socl::specConstant(std::uint32_t{thread_num})},
+                {0, vucol::specConstant(std::uint32_t{thread_num})},
             }
         });
     }
@@ -31,8 +31,8 @@ namespace soclblas{
         return {
             .pipeline = pipeline,
             .bindings = {
-                {0, inputs[0], socl::BufferAccess::Read},
-                {1, inouts[0], socl::BufferAccess::ReadWrite},
+                {0, inputs[0], vucol::BufferAccess::Read},
+                {1, inouts[0], vucol::BufferAccess::ReadWrite},
             },
             .pushConstants = copyPushConstants(args, argsSize),
             .dispatchX = axpyArgs->b,

@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
-#include <soclblas/ops/GemmArguments.hpp>
+#include <vublas/ops/GemmArguments.hpp>
 
-namespace soclblas{
+namespace vublas{
     struct GemvArguments{
         uint32_t b;
         uint32_t m;

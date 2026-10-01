@@ -1,4 +1,5 @@
 # Development Prompt 8
+> **IMPORTANT:** Historical record from before the rename — `socl` is the former name of `vucol`, and `soclBLAS` is the former name of `vuBLAS` (same dependency, project, and library throughout).
 
 ## User Request
 

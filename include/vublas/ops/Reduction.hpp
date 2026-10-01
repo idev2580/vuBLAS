@@ -1,9 +1,9 @@
 #pragma once
-#include "socl/Buffer.hpp"
-#include "soclblas/ops/Operator.hpp"
+#include "vucol/Buffer.hpp"
+#include "vublas/ops/Operator.hpp"
 
 #include <cstdint>
-namespace soclblas{
+namespace vublas{
     struct UnaryReductionArguments{
         uint32_t b;
         uint32_t n;

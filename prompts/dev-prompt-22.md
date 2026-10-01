@@ -1,4 +1,5 @@
 # Separate dispatch planning from execution
+> **IMPORTANT:** Historical record from before the rename — `socl` is the former name of `vucol`, and `soclBLAS` is the former name of `vuBLAS` (same dependency, project, and library throughout).
 
 ## What to implement
 

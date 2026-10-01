@@ -4,22 +4,22 @@
 #include <memory>
 #include <random>
 #include <utility>
-#include <soclblas/BufferView.hpp>
-#include <soclblas/ExecutionPlan.hpp>
-#include <soclblas/ops/AxpyOutPlace.hpp>
-#include <soclblas/ops/DotProductNaive.hpp>
-#include <soclblas/ops/ElementWiseTemplate.hpp>
-#include <soclblas/ops/GemmNaive.hpp>
-#include <soclblas/ops/GemmNaiveTemplate.hpp>
-#include <soclblas/ops/GemmOutPlaceNaive.hpp>
-#include <soclblas/ops/GemmOutPlaceNaiveTemplate.hpp>
-#include <soclblas/ops/GemvNaive.hpp>
-#include <soclblas/ops/GemvNaiveTemplate.hpp>
-#include <soclblas/ops/GemvOutPlaceNaive.hpp>
-#include <soclblas/ops/GemvOutPlaceNaiveTemplate.hpp>
-#include <soclblas/ops/MatMulNaive.hpp>
-#include <soclblas/ops/MatMulNaiveTemplate.hpp>
-#include <soclblas/ops/ReductionNaive.hpp>
+#include <vublas/BufferView.hpp>
+#include <vublas/ExecutionPlan.hpp>
+#include <vublas/ops/AxpyOutPlace.hpp>
+#include <vublas/ops/DotProductNaive.hpp>
+#include <vublas/ops/ElementWiseTemplate.hpp>
+#include <vublas/ops/GemmNaive.hpp>
+#include <vublas/ops/GemmNaiveTemplate.hpp>
+#include <vublas/ops/GemmOutPlaceNaive.hpp>
+#include <vublas/ops/GemmOutPlaceNaiveTemplate.hpp>
+#include <vublas/ops/GemvNaive.hpp>
+#include <vublas/ops/GemvNaiveTemplate.hpp>
+#include <vublas/ops/GemvOutPlaceNaive.hpp>
+#include <vublas/ops/GemvOutPlaceNaiveTemplate.hpp>
+#include <vublas/ops/MatMulNaive.hpp>
+#include <vublas/ops/MatMulNaiveTemplate.hpp>
+#include <vublas/ops/ReductionNaive.hpp>
 #include "lib/MinCpuBlas.hpp"
 
 constexpr int gemm_test_iter = 10;
@@ -29,11 +29,11 @@ constexpr int max_n = 1000;
 constexpr int max_p = 1000;
 constexpr int matmul_test_iter = 10;
 
-socl::DispatchToken execute_plan(
-    socl::Context& ctx,
-    soclblas::DispatchPlan plan
+vucol::DispatchToken execute_plan(
+    vucol::Context& ctx,
+    vublas::DispatchPlan plan
 ){
-    soclblas::ExecutionPlan executionPlan;
+    vublas::ExecutionPlan executionPlan;
     executionPlan.append(std::move(plan));
     return executionPlan.execute(ctx);
 }
@@ -71,7 +71,7 @@ void print_vector(
 }
 
 void run_cpu_gemv(
-    const soclblas::GemvArguments& args,
+    const vublas::GemvArguments& args,
     const std::vector<float>& a,
     const std::vector<float>& x,
     std::vector<float>& y
@@ -95,8 +95,8 @@ void run_cpu_gemv(
 }
 
 TEST(AxpyOutPlaceTest, SupportsBatchAndDistinctStrides){
-    socl::Context ctx;
-    soclblas::AxpyOutPlaceFP32 axpy(ctx);
+    vucol::Context ctx;
+    vublas::AxpyOutPlaceFP32 axpy(ctx);
 
     const uint32_t batch = 3;
     const uint32_t n = 5;
@@ -137,15 +137,15 @@ TEST(AxpyOutPlaceTest, SupportsBatchAndDistinctStrides){
     }
     original_b = b;
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), socl::BufferType::Auto);
-    auto bufferOutB = ctx.createBuffer(sizeof(float) * out_b.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), vucol::BufferType::Auto);
+    auto bufferOutB = ctx.createBuffer(sizeof(float) * out_b.size(), vucol::BufferType::Auto);
 
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferB.write(b.data(), sizeof(float) * b.size());
     bufferOutB.write(out_b.data(), sizeof(float) * out_b.size());
 
-    soclblas::AxpyOutPlaceArguments args = {
+    vublas::AxpyOutPlaceArguments args = {
         .b = batch,
         .n = n,
         .alpha = alpha,
@@ -167,8 +167,8 @@ TEST(AxpyOutPlaceTest, SupportsBatchAndDistinctStrides){
 }
 
 TEST(BufferViewTest, AppliesNonZeroOffsetsToInputsAndOutput){
-    socl::Context ctx;
-    soclblas::AxpyOutPlaceFP32 axpy(ctx);
+    vucol::Context ctx;
+    vublas::AxpyOutPlaceFP32 axpy(ctx);
 
     const std::vector<float> a = {1.0f, 2.0f, 3.0f, 4.0f};
     const std::vector<float> b = {10.0f, 20.0f, 30.0f, 40.0f};
@@ -177,7 +177,7 @@ TEST(BufferViewTest, AppliesNonZeroOffsetsToInputsAndOutput){
 
     const std::size_t rangeSize = sizeof(float) * a.size();
     const std::size_t requiredAlignment =
-        ctx.bufferOffsetAlignment(socl::DescriptorType::StorageBuffer);
+        ctx.bufferOffsetAlignment(vucol::DescriptorType::StorageBuffer);
     const std::size_t alignment = requiredAlignment == 0 ? 1 : requiredAlignment;
     const std::size_t rangeStride =
         ((rangeSize + alignment - 1) / alignment) * alignment;
@@ -186,12 +186,12 @@ TEST(BufferViewTest, AppliesNonZeroOffsetsToInputsAndOutput){
     const std::size_t outputOffset = rangeStride * 3;
     const std::size_t workspaceSize = outputOffset + rangeSize;
 
-    auto workspace = ctx.createBuffer(workspaceSize, socl::BufferType::Auto);
+    auto workspace = ctx.createBuffer(workspaceSize, vucol::BufferType::Auto);
     workspace.write(a.data(), rangeSize, aOffset);
     workspace.write(b.data(), rangeSize, bOffset);
     workspace.write(output.data(), rangeSize, outputOffset);
 
-    const soclblas::AxpyOutPlaceArguments args = {
+    const vublas::AxpyOutPlaceArguments args = {
         .b = 1,
         .n = static_cast<uint32_t>(a.size()),
         .alpha = 2.0f,
@@ -204,9 +204,9 @@ TEST(BufferViewTest, AppliesNonZeroOffsetsToInputsAndOutput){
     };
 
     auto plan = axpy(
-        soclblas::BufferView{workspace, aOffset, rangeSize},
-        soclblas::BufferView{workspace, bOffset, rangeSize},
-        soclblas::BufferView{workspace, outputOffset, rangeSize},
+        vublas::BufferView{workspace, aOffset, rangeSize},
+        vublas::BufferView{workspace, bOffset, rangeSize},
+        vublas::BufferView{workspace, outputOffset, rangeSize},
         args
     );
 
@@ -227,7 +227,7 @@ TEST(BufferViewTest, AppliesNonZeroOffsetsToInputsAndOutput){
 
 template<typename MatMulOp>
 void run_matmul_test(const char* op_name){
-    socl::Context ctx;
+    vucol::Context ctx;
     //ctx.printGpuInfo(std::cout);
     /*for(auto tile : ctx.cooperativeMatrixSupportInfo().tiles){
         printf(
@@ -244,9 +244,9 @@ void run_matmul_test(const char* op_name){
         );
     }*/
     MatMulOp matmul(ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4);
-    auto bufferA = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_n, socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * max_batch * max_n * max_p, socl::BufferType::Auto);
-    auto bufferC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_n, vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * max_batch * max_n * max_p, vucol::BufferType::Auto);
+    auto bufferC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, vucol::BufferType::Auto);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -309,7 +309,7 @@ void run_matmul_test(const char* op_name){
         bufferA.write(a.data(), sizeof(float) * batch * m * n);
         bufferB.write(b.data(), sizeof(float) * batch * n * p);
         bufferC.write(c.data(), sizeof(float) * batch * m * p);
-        soclblas::MatMulArguments matmul_args = {
+        vublas::MatMulArguments matmul_args = {
             .b = batch,
             .m = m,
             .n = n,
@@ -347,12 +347,12 @@ void run_matmul_test(const char* op_name){
 }
 
 TEST(GEMMTest, BasicAssertion){
-    socl::Context ctx;
+    vucol::Context ctx;
     ctx.printGpuInfo(std::cout);
-    soclblas::GemmNaiveFP32 gemm(ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4);
-    auto bufferA = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_n, socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * max_batch * max_n * max_p, socl::BufferType::Auto);
-    auto bufferC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, socl::BufferType::Auto);
+    vublas::GemmNaiveFP32 gemm(ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4);
+    auto bufferA = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_n, vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * max_batch * max_n * max_p, vucol::BufferType::Auto);
+    auto bufferC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, vucol::BufferType::Auto);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -412,7 +412,7 @@ TEST(GEMMTest, BasicAssertion){
         bufferA.write(a.data(), sizeof(float) * batch * m * n);
         bufferB.write(b.data(), sizeof(float) * batch * n * p);
         bufferC.write(c.data(), sizeof(float) * batch * m * p);
-        soclblas::GemmArguments gemm_args = {
+        vublas::GemmArguments gemm_args = {
             .b = batch,
             .m = m,
             .n = n,
@@ -446,13 +446,13 @@ TEST(GEMMTest, BasicAssertion){
 }
 
 TEST(GemvNaiveTest, BasicAssertion){
-    socl::Context ctx;
+    vucol::Context ctx;
     // For extremely small P case of GEMV, arguments should be manually modified.
     // So, I modified the arguments by hand.
-    soclblas::GemvNaiveFP32 gemv(ctx, 16, 1, 2, 1, 2, 1, 16, 1, 4);
-    auto bufferA = ctx.createBuffer(sizeof(float) * max_m * max_n, socl::BufferType::Auto);
-    auto bufferX = ctx.createBuffer(sizeof(float) * max_batch * max_n, socl::BufferType::Auto);
-    auto bufferY = ctx.createBuffer(sizeof(float) * max_batch * max_m, socl::BufferType::Auto);
+    vublas::GemvNaiveFP32 gemv(ctx, 16, 1, 2, 1, 2, 1, 16, 1, 4);
+    auto bufferA = ctx.createBuffer(sizeof(float) * max_m * max_n, vucol::BufferType::Auto);
+    auto bufferX = ctx.createBuffer(sizeof(float) * max_batch * max_n, vucol::BufferType::Auto);
+    auto bufferY = ctx.createBuffer(sizeof(float) * max_batch * max_m, vucol::BufferType::Auto);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -489,7 +489,7 @@ TEST(GemvNaiveTest, BasicAssertion){
         bufferA.write(a.data(), sizeof(float) * m * n);
         bufferX.write(x.data(), sizeof(float) * batch * n);
         bufferY.write(y.data(), sizeof(float) * batch * m);
-        soclblas::GemvArguments gemv_args = {
+        vublas::GemvArguments gemv_args = {
             .b = batch,
             .m = m,
             .n = n,
@@ -521,14 +521,14 @@ TEST(GemvNaiveTest, BasicAssertion){
 }
 
 TEST(GemmOutPlaceNaiveTest, BasicAssertion){
-    socl::Context ctx;
-    soclblas::GemmOutPlaceNaiveFP32 gemm(
+    vucol::Context ctx;
+    vublas::GemmOutPlaceNaiveFP32 gemm(
         ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
-    auto bufferA = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_n, socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * max_batch * max_n * max_p, socl::BufferType::Auto);
-    auto bufferC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, socl::BufferType::Auto);
-    auto bufferOutC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_n, vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * max_batch * max_n * max_p, vucol::BufferType::Auto);
+    auto bufferC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, vucol::BufferType::Auto);
+    auto bufferOutC = ctx.createBuffer(sizeof(float) * max_batch * max_m * max_p, vucol::BufferType::Auto);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -575,7 +575,7 @@ TEST(GemmOutPlaceNaiveTest, BasicAssertion){
         bufferB.write(b.data(), sizeof(float) * batch * n * p);
         bufferC.write(c.data(), sizeof(float) * batch * m * p);
         bufferOutC.write(out_c.data(), sizeof(float) * batch * m * p);
-        soclblas::GemmArguments gemm_args = {
+        vublas::GemmArguments gemm_args = {
             .b = batch,
             .m = m,
             .n = n,
@@ -612,8 +612,8 @@ TEST(GemmOutPlaceNaiveTest, BasicAssertion){
 }
 
 TEST(GemmOutPlaceNaiveTest, SupportsDistinctOutputStride){
-    socl::Context ctx;
-    soclblas::GemmOutPlaceNaiveFP32 gemm(
+    vucol::Context ctx;
+    vublas::GemmOutPlaceNaiveFP32 gemm(
         ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
 
@@ -661,17 +661,17 @@ TEST(GemmOutPlaceNaiveTest, SupportsDistinctOutputStride){
         }
     }
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), socl::BufferType::Auto);
-    auto bufferC = ctx.createBuffer(sizeof(float) * c.size(), socl::BufferType::Auto);
-    auto bufferOutC = ctx.createBuffer(sizeof(float) * out_c.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), vucol::BufferType::Auto);
+    auto bufferC = ctx.createBuffer(sizeof(float) * c.size(), vucol::BufferType::Auto);
+    auto bufferOutC = ctx.createBuffer(sizeof(float) * out_c.size(), vucol::BufferType::Auto);
 
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferB.write(b.data(), sizeof(float) * b.size());
     bufferC.write(c.data(), sizeof(float) * c.size());
     bufferOutC.write(out_c.data(), sizeof(float) * out_c.size());
 
-    soclblas::GemmOutPlaceArguments gemm_args = soclblas::GemmOutPlaceArguments::sameOutputLayout({
+    vublas::GemmOutPlaceArguments gemm_args = vublas::GemmOutPlaceArguments::sameOutputLayout({
         .b = batch,
         .m = m,
         .n = n,
@@ -705,14 +705,14 @@ TEST(GemmOutPlaceNaiveTest, SupportsDistinctOutputStride){
 }
 
 TEST(GemvOutPlaceNaiveTest, BasicAssertion){
-    socl::Context ctx;
-    soclblas::GemvOutPlaceNaiveFP32 gemv(
+    vucol::Context ctx;
+    vublas::GemvOutPlaceNaiveFP32 gemv(
         ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
-    auto bufferA = ctx.createBuffer(sizeof(float) * max_m * max_n, socl::BufferType::Auto);
-    auto bufferX = ctx.createBuffer(sizeof(float) * max_batch * max_n, socl::BufferType::Auto);
-    auto bufferY = ctx.createBuffer(sizeof(float) * max_batch * max_m, socl::BufferType::Auto);
-    auto bufferOutY = ctx.createBuffer(sizeof(float) * max_batch * max_m, socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * max_m * max_n, vucol::BufferType::Auto);
+    auto bufferX = ctx.createBuffer(sizeof(float) * max_batch * max_n, vucol::BufferType::Auto);
+    auto bufferY = ctx.createBuffer(sizeof(float) * max_batch * max_m, vucol::BufferType::Auto);
+    auto bufferOutY = ctx.createBuffer(sizeof(float) * max_batch * max_m, vucol::BufferType::Auto);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -753,7 +753,7 @@ TEST(GemvOutPlaceNaiveTest, BasicAssertion){
         bufferX.write(x.data(), sizeof(float) * batch * n);
         bufferY.write(y.data(), sizeof(float) * batch * m);
         bufferOutY.write(out_y.data(), sizeof(float) * batch * m);
-        soclblas::GemvArguments gemv_args = {
+        vublas::GemvArguments gemv_args = {
             .b = batch,
             .m = m,
             .n = n,
@@ -788,8 +788,8 @@ TEST(GemvOutPlaceNaiveTest, BasicAssertion){
 }
 
 TEST(GemvOutPlaceNaiveTest, SupportsDistinctOutputStride){
-    socl::Context ctx;
-    soclblas::GemvOutPlaceNaiveFP32 gemv(
+    vucol::Context ctx;
+    vublas::GemvOutPlaceNaiveFP32 gemv(
         ctx, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
 
@@ -825,7 +825,7 @@ TEST(GemvOutPlaceNaiveTest, SupportsDistinctOutputStride){
         cpu_y[i] = y[i];
     }
 
-    soclblas::GemvArguments gemv_args = {
+    vublas::GemvArguments gemv_args = {
         .b = batch,
         .m = m,
         .n = n,
@@ -848,17 +848,17 @@ TEST(GemvOutPlaceNaiveTest, SupportsDistinctOutputStride){
         }
     }
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferX = ctx.createBuffer(sizeof(float) * x.size(), socl::BufferType::Auto);
-    auto bufferY = ctx.createBuffer(sizeof(float) * y.size(), socl::BufferType::Auto);
-    auto bufferOutY = ctx.createBuffer(sizeof(float) * out_y.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferX = ctx.createBuffer(sizeof(float) * x.size(), vucol::BufferType::Auto);
+    auto bufferY = ctx.createBuffer(sizeof(float) * y.size(), vucol::BufferType::Auto);
+    auto bufferOutY = ctx.createBuffer(sizeof(float) * out_y.size(), vucol::BufferType::Auto);
 
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferX.write(x.data(), sizeof(float) * x.size());
     bufferY.write(y.data(), sizeof(float) * y.size());
     bufferOutY.write(out_y.data(), sizeof(float) * out_y.size());
 
-    soclblas::GemvOutPlaceArguments gemv_out_args = soclblas::GemvOutPlaceArguments::sameOutputLayout(gemv_args);
+    vublas::GemvOutPlaceArguments gemv_out_args = vublas::GemvOutPlaceArguments::sameOutputLayout(gemv_args);
     gemv_out_args.out_y_m_stride = out_y_m_stride;
     gemv_out_args.out_y_b_stride = out_y_b_stride;
 
@@ -875,8 +875,8 @@ TEST(GemvOutPlaceNaiveTest, SupportsDistinctOutputStride){
 }
 
 TEST(ReductionNaiveTest, ComputesDotProductWithBatchStrides){
-    socl::Context ctx;
-    soclblas::DotProductNaiveFP32 dot(ctx, 32, 2);
+    vucol::Context ctx;
+    vublas::DotProductNaiveFP32 dot(ctx, 32, 2);
 
     constexpr uint32_t batch = 2;
     constexpr uint32_t n = 67;
@@ -919,15 +919,15 @@ TEST(ReductionNaiveTest, ComputesDotProductWithBatchStrides){
         expected_out[out_idx] = acc;
     }
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), socl::BufferType::Auto);
-    auto bufferOut = ctx.createBuffer(sizeof(float) * out.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), vucol::BufferType::Auto);
+    auto bufferOut = ctx.createBuffer(sizeof(float) * out.size(), vucol::BufferType::Auto);
 
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferB.write(b.data(), sizeof(float) * b.size());
     bufferOut.write(out.data(), sizeof(float) * out.size());
 
-    soclblas::BinaryReductionArguments args = {
+    vublas::BinaryReductionArguments args = {
         .b = batch,
         .n = n,
         .a_b_stride = a_b_stride,
@@ -954,8 +954,8 @@ float operation(float x){
     return fma(x, x, 1.0f);
 }
 )";
-    socl::Context ctx;
-    soclblas::UnaryElementwiseTemplateFP32 operation(ctx, squarePlusOne, 32);
+    vucol::Context ctx;
+    vublas::UnaryElementwiseTemplateFP32 operation(ctx, squarePlusOne, 32);
 
     constexpr uint32_t size = 67;
     std::vector<float> input(size);
@@ -967,9 +967,9 @@ float operation(float x){
     }
 
     auto bufferInput =
-        ctx.createBuffer(sizeof(float) * input.size(), socl::BufferType::Auto);
+        ctx.createBuffer(sizeof(float) * input.size(), vucol::BufferType::Auto);
     auto bufferOutput =
-        ctx.createBuffer(sizeof(float) * output.size(), socl::BufferType::Auto);
+        ctx.createBuffer(sizeof(float) * output.size(), vucol::BufferType::Auto);
     bufferInput.write(input.data(), sizeof(float) * input.size());
     bufferOutput.write(output.data(), sizeof(float) * output.size());
 
@@ -978,7 +978,7 @@ float operation(float x){
         operation(
             bufferInput,
             bufferOutput,
-            soclblas::UnaryElementwiseArguments{.size = size}
+            vublas::UnaryElementwiseArguments{.size = size}
         )
     ).wait();
     bufferOutput.read(output.data(), sizeof(float) * output.size());
@@ -992,8 +992,8 @@ float operation(float x, float y){
     return fma(x, y, x);
 }
 )";
-    socl::Context ctx;
-    soclblas::BinaryElementwiseTemplateFP32 operation(ctx, multiplyAdd, 32);
+    vucol::Context ctx;
+    vublas::BinaryElementwiseTemplateFP32 operation(ctx, multiplyAdd, 32);
 
     constexpr uint32_t size = 67;
     std::vector<float> a(size);
@@ -1006,10 +1006,10 @@ float operation(float x, float y){
         expected[i] = a[i] * b[i] + a[i];
     }
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float) * b.size(), vucol::BufferType::Auto);
     auto bufferOutput =
-        ctx.createBuffer(sizeof(float) * output.size(), socl::BufferType::Auto);
+        ctx.createBuffer(sizeof(float) * output.size(), vucol::BufferType::Auto);
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferB.write(b.data(), sizeof(float) * b.size());
     bufferOutput.write(output.data(), sizeof(float) * output.size());
@@ -1020,7 +1020,7 @@ float operation(float x, float y){
             bufferA,
             bufferB,
             bufferOutput,
-            soclblas::BinaryElementwiseArguments{.size = size}
+            vublas::BinaryElementwiseArguments{.size = size}
         )
     ).wait();
     bufferOutput.read(output.data(), sizeof(float) * output.size());
@@ -1029,9 +1029,9 @@ float operation(float x, float y){
 }
 
 TEST(ReductionNaiveTest, ComputesSumAndAvgWithBatchStrides){
-    socl::Context ctx;
-    soclblas::SumNaiveFP32 sum(ctx);
-    soclblas::AvgNaiveFP32 avg(ctx);
+    vucol::Context ctx;
+    vublas::SumNaiveFP32 sum(ctx);
+    vublas::AvgNaiveFP32 avg(ctx);
 
     constexpr uint32_t batch = 2;
     constexpr uint32_t n = 5;
@@ -1070,15 +1070,15 @@ TEST(ReductionNaiveTest, ComputesSumAndAvgWithBatchStrides){
         expected_avg[out_idx] = acc / float(n);
     }
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferSumOut = ctx.createBuffer(sizeof(float) * sum_out.size(), socl::BufferType::Auto);
-    auto bufferAvgOut = ctx.createBuffer(sizeof(float) * avg_out.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferSumOut = ctx.createBuffer(sizeof(float) * sum_out.size(), vucol::BufferType::Auto);
+    auto bufferAvgOut = ctx.createBuffer(sizeof(float) * avg_out.size(), vucol::BufferType::Auto);
 
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferSumOut.write(sum_out.data(), sizeof(float) * sum_out.size());
     bufferAvgOut.write(avg_out.data(), sizeof(float) * avg_out.size());
 
-    soclblas::UnaryReductionArguments args = {
+    vublas::UnaryReductionArguments args = {
         .b = batch,
         .n = n,
         .a_b_stride = a_b_stride,
@@ -1100,9 +1100,9 @@ TEST(ReductionNaiveTest, ComputesSumAndAvgWithBatchStrides){
 }
 
 TEST(ReductionNaiveTest, ComputesMaxAndMinValuesAndIndices){
-    socl::Context ctx;
-    soclblas::MaxNaiveFP32 max(ctx);
-    soclblas::MinNaiveFP32 min(ctx);
+    vucol::Context ctx;
+    vublas::MaxNaiveFP32 max(ctx);
+    vublas::MinNaiveFP32 min(ctx);
 
     constexpr uint32_t batch = 2;
     constexpr uint32_t n = 6;
@@ -1161,11 +1161,11 @@ TEST(ReductionNaiveTest, ComputesMaxAndMinValuesAndIndices){
         expected_min_indices[index_idx] = min_idx;
     }
 
-    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), socl::BufferType::Auto);
-    auto bufferMaxValues = ctx.createBuffer(sizeof(float) * max_values.size(), socl::BufferType::Auto);
-    auto bufferMinValues = ctx.createBuffer(sizeof(float) * min_values.size(), socl::BufferType::Auto);
-    auto bufferMaxIndices = ctx.createBuffer(sizeof(uint32_t) * max_indices.size(), socl::BufferType::Auto);
-    auto bufferMinIndices = ctx.createBuffer(sizeof(uint32_t) * min_indices.size(), socl::BufferType::Auto);
+    auto bufferA = ctx.createBuffer(sizeof(float) * a.size(), vucol::BufferType::Auto);
+    auto bufferMaxValues = ctx.createBuffer(sizeof(float) * max_values.size(), vucol::BufferType::Auto);
+    auto bufferMinValues = ctx.createBuffer(sizeof(float) * min_values.size(), vucol::BufferType::Auto);
+    auto bufferMaxIndices = ctx.createBuffer(sizeof(uint32_t) * max_indices.size(), vucol::BufferType::Auto);
+    auto bufferMinIndices = ctx.createBuffer(sizeof(uint32_t) * min_indices.size(), vucol::BufferType::Auto);
 
     bufferA.write(a.data(), sizeof(float) * a.size());
     bufferMaxValues.write(max_values.data(), sizeof(float) * max_values.size());
@@ -1173,7 +1173,7 @@ TEST(ReductionNaiveTest, ComputesMaxAndMinValuesAndIndices){
     bufferMaxIndices.write(max_indices.data(), sizeof(uint32_t) * max_indices.size());
     bufferMinIndices.write(min_indices.data(), sizeof(uint32_t) * min_indices.size());
 
-    soclblas::IndexedUnaryReductionArguments args = {
+    vublas::IndexedUnaryReductionArguments args = {
         .b = batch,
         .n = n,
         .a_b_stride = a_b_stride,
@@ -1207,7 +1207,7 @@ TEST(ReductionNaiveTest, ComputesMaxAndMinValuesAndIndices){
 }
 
 TEST(MatMulNaiveTest, BasicAssertion){
-    run_matmul_test<soclblas::MatMulNaiveFP32>("MatMulNaiveFP32");
+    run_matmul_test<vublas::MatMulNaiveFP32>("MatMulNaiveFP32");
 }
 
 TEST(NaiveTemplateTest, AppliesRuntimeReluEpilogue){
@@ -1216,11 +1216,11 @@ float epilogue(float value){
     return max(value, 0.0f);
 }
 )";
-    socl::Context ctx;
-    auto bufferA = ctx.createBuffer(sizeof(float), socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(sizeof(float), socl::BufferType::Auto);
-    auto bufferC = ctx.createBuffer(sizeof(float), socl::BufferType::Auto);
-    auto bufferOut = ctx.createBuffer(sizeof(float), socl::BufferType::Auto);
+    vucol::Context ctx;
+    auto bufferA = ctx.createBuffer(sizeof(float), vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(sizeof(float), vucol::BufferType::Auto);
+    auto bufferC = ctx.createBuffer(sizeof(float), vucol::BufferType::Auto);
+    auto bufferOut = ctx.createBuffer(sizeof(float), vucol::BufferType::Auto);
 
     const float a = -2.0f;
     const float b = 3.0f;
@@ -1229,7 +1229,7 @@ float epilogue(float value){
     bufferA.write(&a, sizeof(a));
     bufferB.write(&b, sizeof(b));
 
-    const soclblas::GemmArguments gemmArgs = {
+    const vublas::GemmArguments gemmArgs = {
         .b = 1, .m = 1, .n = 1, .p = 1,
         .alpha = 1.0f, .beta = 0.0f,
         .a_stride = 1, .b_stride = 1, .c_stride = 1,
@@ -1237,14 +1237,14 @@ float epilogue(float value){
         .b_n_stride = 1, .b_p_stride = 1,
         .c_m_stride = 1, .c_p_stride = 1
     };
-    const soclblas::MatMulArguments matmulArgs = {
+    const vublas::MatMulArguments matmulArgs = {
         .b = 1, .m = 1, .n = 1, .p = 1,
         .a_stride = 1, .b_stride = 1, .c_stride = 1,
         .a_m_stride = 1, .a_n_stride = 1,
         .b_n_stride = 1, .b_p_stride = 1,
         .c_m_stride = 1, .c_p_stride = 1
     };
-    const soclblas::GemvArguments gemvArgs = {
+    const vublas::GemvArguments gemvArgs = {
         .b = 1, .m = 1, .n = 1,
         .alpha = 1.0f, .beta = 0.0f,
         .a_m_stride = 1, .a_n_stride = 1,
@@ -1252,7 +1252,7 @@ float epilogue(float value){
         .y_m_stride = 1, .y_b_stride = 1
     };
 
-    soclblas::GemmNaiveTemplateFP32 gemm(
+    vublas::GemmNaiveTemplateFP32 gemm(
         ctx, relu, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
     bufferC.write(&initial, sizeof(initial));
@@ -1260,7 +1260,7 @@ float epilogue(float value){
     bufferC.read(&result, sizeof(result));
     EXPECT_FLOAT_EQ(result, 0.0f);
 
-    soclblas::GemmOutPlaceNaiveTemplateFP32 gemmOutPlace(
+    vublas::GemmOutPlaceNaiveTemplateFP32 gemmOutPlace(
         ctx, relu, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
     bufferC.write(&initial, sizeof(initial));
@@ -1272,13 +1272,13 @@ float epilogue(float value){
             bufferB,
             bufferC,
             bufferOut,
-            soclblas::GemmOutPlaceArguments::sameOutputLayout(gemmArgs)
+            vublas::GemmOutPlaceArguments::sameOutputLayout(gemmArgs)
         )
     ).wait();
     bufferOut.read(&result, sizeof(result));
     EXPECT_FLOAT_EQ(result, 0.0f);
 
-    soclblas::MatMulNaiveTemplateFP32 matmul(
+    vublas::MatMulNaiveTemplateFP32 matmul(
         ctx, relu, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
     bufferOut.write(&initial, sizeof(initial));
@@ -1286,7 +1286,7 @@ float epilogue(float value){
     bufferOut.read(&result, sizeof(result));
     EXPECT_FLOAT_EQ(result, 0.0f);
 
-    soclblas::GemvNaiveTemplateFP32 gemv(
+    vublas::GemvNaiveTemplateFP32 gemv(
         ctx, relu, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
     bufferC.write(&initial, sizeof(initial));
@@ -1294,7 +1294,7 @@ float epilogue(float value){
     bufferC.read(&result, sizeof(result));
     EXPECT_FLOAT_EQ(result, 0.0f);
 
-    soclblas::GemvOutPlaceNaiveTemplateFP32 gemvOutPlace(
+    vublas::GemvOutPlaceNaiveTemplateFP32 gemvOutPlace(
         ctx, relu, 1, 1, 32, 4, 2, 4, 16, 1, 4
     );
     bufferC.write(&initial, sizeof(initial));

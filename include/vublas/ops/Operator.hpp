@@ -4,10 +4,10 @@
 #include <span>
 #include <vector>
 
-#include <soclblas/BufferView.hpp>
-#include <soclblas/ExecutionPlan.hpp>
+#include <vublas/BufferView.hpp>
+#include <vublas/ExecutionPlan.hpp>
 
-namespace soclblas{
+namespace vublas{
     class Operator{
         protected:
         static std::vector<std::byte> copyPushConstants(

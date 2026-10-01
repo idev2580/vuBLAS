@@ -5,25 +5,25 @@
 #include <optional>
 #include <vector>
 
-#include <socl/Context.hpp>
-#include <socl/DescriptorSet.hpp>
-#include <socl/ShaderPipeline.hpp>
-#include <soclblas/BufferView.hpp>
+#include <vucol/Context.hpp>
+#include <vucol/DescriptorSet.hpp>
+#include <vucol/ShaderPipeline.hpp>
+#include <vublas/BufferView.hpp>
 
-namespace soclblas{
+namespace vublas{
     struct BufferBinding{
         std::uint32_t binding;
         BufferView view;
-        socl::BufferAccess access;
+        vucol::BufferAccess access;
     };
 
     struct DispatchPlanResource{
-        socl::DescriptorSet descriptorSet;
-        socl::Context* context = nullptr;
+        vucol::DescriptorSet descriptorSet;
+        vucol::Context* context = nullptr;
     };
 
     struct DispatchPlan{
-        socl::ShaderPipeline pipeline;
+        vucol::ShaderPipeline pipeline;
         std::vector<BufferBinding> bindings;
         std::vector<std::byte> pushConstants;
         std::uint32_t dispatchX;
@@ -31,8 +31,8 @@ namespace soclblas{
         std::uint32_t dispatchZ;
         mutable std::optional<DispatchPlanResource> resource;
 
-        void allocate(socl::Context& ctx) const;
-        void record(socl::Context& ctx) const;
+        void allocate(vucol::Context& ctx) const;
+        void record(vucol::Context& ctx) const;
     };
 
     class ExecutionPlan{
@@ -41,7 +41,7 @@ namespace soclblas{
 
         public:
         void append(DispatchPlan plan);
-        void record(socl::Context& ctx) const;
-        [[nodiscard]] socl::DispatchToken execute(socl::Context& ctx, bool recordGpuTimestamp = false) const;
+        void record(vucol::Context& ctx) const;
+        [[nodiscard]] vucol::DispatchToken execute(vucol::Context& ctx, bool recordGpuTimestamp = false) const;
     };
 }

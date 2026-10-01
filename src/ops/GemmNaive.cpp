@@ -1,9 +1,9 @@
-#include <soclblas/ops/GemmNaive.hpp>
+#include <vublas/ops/GemmNaive.hpp>
 #include <GemmNaiveFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     GemmNaiveFP32::GemmNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
         uint32_t subgroup_tile_p,

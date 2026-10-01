@@ -1,11 +1,11 @@
-#include <soclblas/ExecutionPlan.hpp>
+#include <vublas/ExecutionPlan.hpp>
 
 #include <algorithm>
 #include <stdexcept>
 #include <utility>
 
-namespace soclblas{
-    void DispatchPlan::allocate(socl::Context& ctx) const{
+namespace vublas{
+    void DispatchPlan::allocate(vucol::Context& ctx) const{
         if(resource){
             if(resource->context != &ctx){
                 throw std::runtime_error(
@@ -64,7 +64,7 @@ namespace soclblas{
         resource = std::move(allocated);
     }
 
-    void DispatchPlan::record(socl::Context& ctx) const{
+    void DispatchPlan::record(vucol::Context& ctx) const{
         allocate(ctx);
         if(pushConstants.size() != pipeline.pushConstantSize()){
             throw std::runtime_error(
@@ -94,13 +94,13 @@ namespace soclblas{
         plans.push_back(std::move(plan));
     }
 
-    void ExecutionPlan::record(socl::Context& ctx) const{
+    void ExecutionPlan::record(vucol::Context& ctx) const{
         for(const auto& plan : plans){
             plan.record(ctx);
         }
     }
 
-    socl::DispatchToken ExecutionPlan::execute(socl::Context& ctx, bool recordGpuTimestamp) const{
+    vucol::DispatchToken ExecutionPlan::execute(vucol::Context& ctx, bool recordGpuTimestamp) const{
         recordGpuTimestamp? ctx.beginTimed(): ctx.begin();
         record(ctx);
         return ctx.submitAsync();

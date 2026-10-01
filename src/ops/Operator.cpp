@@ -1,8 +1,8 @@
-#include <soclblas/ops/Operator.hpp>
+#include <vublas/ops/Operator.hpp>
 
 #include <cstring>
 
-namespace soclblas{
+namespace vublas{
     std::vector<std::byte> Operator::copyPushConstants(
         const void* args,
         std::size_t argsSize

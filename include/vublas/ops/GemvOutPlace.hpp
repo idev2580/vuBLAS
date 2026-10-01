@@ -1,15 +1,15 @@
 #pragma once
-#include "soclblas/ops/Operator.hpp"
-#include "soclblas/ops/GemmOutPlace.hpp"
-#include <soclblas/ops/GemvArguments.hpp>
+#include "vublas/ops/Operator.hpp"
+#include "vublas/ops/GemmOutPlace.hpp"
+#include <vublas/ops/GemvArguments.hpp>
 #include <cstdint>
 #include <memory>
 
-namespace soclblas{
+namespace vublas{
     class GemvOutPlace: public Operator{
         protected:
         std::unique_ptr<GemmOutPlace> gemm;
-        explicit GemvOutPlace(socl::Context& ctx);
+        explicit GemvOutPlace(vucol::Context& ctx);
 
         public:
         virtual DispatchPlan execute(

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
-project(soclBLAS VERSION 0.1.0 LANGUAGES CXX)
+project(vuBLAS VERSION 0.1.0 LANGUAGES CXX)
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     set(
         CMAKE_INSTALL_PREFIX
-        "/opt/socl"
-        CACHE PATH "soclBLAS installation prefix"
+        "/opt/vucol"
+        CACHE PATH "vuBLAS installation prefix"
         FORCE
     )
 endif()
@@ -18,11 +18,11 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 option(
-    SOCLBLAS_BUILD_TESTS
-    "Build soclBLAS tests and performance executables"
-    OFF
+    VUBLAS_BUILD_TESTS
+    "Build vuBLAS tests and performance executables"
+    ON
 )
-find_package(SOCL CONFIG REQUIRED HINTS "${CMAKE_INSTALL_PREFIX}")
+find_package(VUCOL CONFIG REQUIRED HINTS "${CMAKE_INSTALL_PREFIX}")
 
 set(GEMM_NAIVE_TEMPLATE
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders/templates/GemmNaiveFP32.comp"
@@ -59,30 +59,30 @@ add_custom_command(
         "${UNARY_ELEMENTWISE_TEMPLATE}"
         "${BINARY_ELEMENTWISE_TEMPLATE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmbedShaderTemplates.cmake"
-    COMMENT "Embedding soclBLAS shader templates"
+    COMMENT "Embedding vuBLAS shader templates"
     VERBATIM
 )
 
 add_subdirectory(shaders)
 add_subdirectory(src)
-if(SOCLBLAS_BUILD_TESTS)
+if(VUBLAS_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
 add_library(
-    soclblas SHARED
+    vublas SHARED
     ${SOURCES}
     "${EMBEDDED_SHADER_TEMPLATES_CPP}"
 )
-add_library(soclBLAS::soclblas ALIAS soclblas)
-set_target_properties(soclblas PROPERTIES
+add_library(vuBLAS::vublas ALIAS vublas)
+set_target_properties(vublas PROPERTIES
     VERSION "${PROJECT_VERSION}"
     SOVERSION "${PROJECT_VERSION_MAJOR}"
     WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
-add_dependencies(soclblas soclblas_compile_shaders)
-target_compile_features(soclblas PUBLIC cxx_std_20)
-target_include_directories(soclblas
+add_dependencies(vublas vublas_compile_shaders)
+target_compile_features(vublas PUBLIC cxx_std_20)
+target_include_directories(vublas
     PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
@@ -90,46 +90,46 @@ target_include_directories(soclblas
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
         "${CMAKE_CURRENT_BINARY_DIR}/shaders"
 )
-target_link_libraries(soclblas PUBLIC SOCL::socl)
+target_link_libraries(vublas PUBLIC VUCOL::vucol)
 
 install(
-    TARGETS soclblas
-    EXPORT soclBLASTargets
+    TARGETS vublas
+    EXPORT vuBLASTargets
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 install(
-    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/soclblas"
+    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/vublas"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 install(
     FILES "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
-    DESTINATION "${CMAKE_INSTALL_DATADIR}/doc/soclBLAS"
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/doc/vuBLAS"
 )
 install(
-    EXPORT soclBLASTargets
-    FILE soclBLASTargets.cmake
-    NAMESPACE soclBLAS::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soclBLAS"
+    EXPORT vuBLASTargets
+    FILE vuBLASTargets.cmake
+    NAMESPACE vuBLAS::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/vuBLAS"
 )
 
 configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/soclBLASConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/soclBLASConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soclBLAS"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/vuBLASConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/vuBLASConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/vuBLAS"
 )
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/soclBLASConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/vuBLASConfigVersion.cmake"
     VERSION "${PROJECT_VERSION}"
     COMPATIBILITY SameMajorVersion
 )
 install(
     FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/soclBLASConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/soclBLASConfigVersion.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soclBLAS"
+        "${CMAKE_CURRENT_BINARY_DIR}/vuBLASConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/vuBLASConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/vuBLAS"
 )
 
 function(copy_target_runtime_dlls target_name)
@@ -143,7 +143,7 @@ function(copy_target_runtime_dlls target_name)
     endif()
 endfunction()
 
-if(SOCLBLAS_BUILD_TESTS)
+if(VUBLAS_BUILD_TESTS)
     enable_testing()
     include(FetchContent)
 
@@ -156,24 +156,24 @@ if(SOCLBLAS_BUILD_TESTS)
         GIT_TAG        v1.14.0
     )
     FetchContent_MakeAvailable(googletest)
-    add_executable(soclblas_tests ${TEST_SOURCES})
-    target_link_libraries(soclblas_tests PRIVATE soclblas GTest::gtest_main)
-    copy_target_runtime_dlls(soclblas_tests)
+    add_executable(vublas_tests ${TEST_SOURCES})
+    target_link_libraries(vublas_tests PRIVATE vublas GTest::gtest_main)
+    copy_target_runtime_dlls(vublas_tests)
 
     include(GoogleTest)
-    gtest_discover_tests(soclblas_tests)
+    gtest_discover_tests(vublas_tests)
 
-    add_executable(soclblas_performance_tests ${PERFORMANCE_TEST_SOURCES})
-    target_link_libraries(soclblas_performance_tests PRIVATE soclblas)
-    copy_target_runtime_dlls(soclblas_performance_tests)
+    add_executable(vublas_performance_tests ${PERFORMANCE_TEST_SOURCES})
+    target_link_libraries(vublas_performance_tests PRIVATE vublas)
+    copy_target_runtime_dlls(vublas_performance_tests)
 
     add_executable(
-        soclblas_performance_sweep_tests
+        vublas_performance_sweep_tests
         ${PERFORMANCE_SWEEP_TEST_SOURCES}
     )
     target_link_libraries(
-        soclblas_performance_sweep_tests
-        PRIVATE soclblas
+        vublas_performance_sweep_tests
+        PRIVATE vublas
     )
-    copy_target_runtime_dlls(soclblas_performance_sweep_tests)
+    copy_target_runtime_dlls(vublas_performance_sweep_tests)
 endif()

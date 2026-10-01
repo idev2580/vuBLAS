@@ -10,9 +10,9 @@
 #include <utility>
 #include <vector>
 
-#include <socl/Context.hpp>
-#include <soclblas/ExecutionPlan.hpp>
-#include <soclblas/ops/GemmNaive.hpp>
+#include <vucol/Context.hpp>
+#include <vublas/ExecutionPlan.hpp>
+#include <vublas/ops/GemmNaive.hpp>
 
 constexpr int GPU_IDX = 0;
 constexpr uint32_t B = 2;
@@ -22,11 +22,11 @@ constexpr int P = 4096;
 constexpr size_t DEEP_SELECTION_COUNT = 10;
 constexpr uint32_t DEEP_REPEAT_COUNT = 10;
 
-socl::DispatchToken execute_plan(
-    socl::Context& ctx,
-    soclblas::DispatchPlan plan
+vucol::DispatchToken execute_plan(
+    vucol::Context& ctx,
+    vublas::DispatchPlan plan
 ){
-    soclblas::ExecutionPlan executionPlan;
+    vublas::ExecutionPlan executionPlan;
     executionPlan.append(std::move(plan));
     return executionPlan.execute(ctx);
 }
@@ -253,7 +253,7 @@ int main() {
     const uint32_t c_stride =
         checked_stride(M, P, "c_stride");
 
-    const soclblas::GemmArguments args = {
+    const vublas::GemmArguments args = {
         .b = B,
         .m = M,
         .n = N,
@@ -271,10 +271,10 @@ int main() {
         .c_p_stride = 1
     };
 
-    socl::Context ctx({GPU_IDX});
-    auto bufferA = ctx.createBuffer(a_bytes, socl::BufferType::Auto);
-    auto bufferB = ctx.createBuffer(b_bytes, socl::BufferType::Auto);
-    auto bufferC = ctx.createBuffer(c_bytes, socl::BufferType::Auto);
+    vucol::Context ctx({GPU_IDX});
+    auto bufferA = ctx.createBuffer(a_bytes, vucol::BufferType::Auto);
+    auto bufferB = ctx.createBuffer(b_bytes, vucol::BufferType::Auto);
+    auto bufferC = ctx.createBuffer(c_bytes, vucol::BufferType::Auto);
 
     bufferA.write(a.data(), a_bytes);
     bufferB.write(b.data(), b_bytes);
@@ -300,7 +300,7 @@ int main() {
             }
 
             try {
-                soclblas::GemmNaiveFP32 gemm(
+                vublas::GemmNaiveFP32 gemm(
                     ctx,
                     config.subgroup_tile_m,
                     config.subgroup_tile_n,
@@ -371,7 +371,7 @@ int main() {
     for(const auto& scan_result : scan_results) {
         const SweepConfig& config = scan_result.first;
         try {
-            soclblas::GemmNaiveFP32 gemm(
+            vublas::GemmNaiveFP32 gemm(
                 ctx,
                 config.subgroup_tile_m,
                 config.subgroup_tile_n,

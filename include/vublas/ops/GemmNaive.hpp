@@ -1,13 +1,13 @@
 #pragma once
-#include "socl/Buffer.hpp"
-#include "socl/Context.hpp"
-#include <soclblas/ops/MatMul.hpp>
+#include "vucol/Buffer.hpp"
+#include "vucol/Context.hpp"
+#include <vublas/ops/Gemm.hpp>
 
-namespace soclblas{
-    class MatMulNaiveFP32: public MatMul{
+namespace vublas{
+    class GemmNaiveFP32: public Gemm{
         public:
-        MatMulNaiveFP32(
-            socl::Context& ctx,
+        GemmNaiveFP32(
+            vucol::Context& ctx,
             uint32_t subgroup_tile_m,
             uint32_t subgroup_tile_n,
             uint32_t subgroup_tile_p,

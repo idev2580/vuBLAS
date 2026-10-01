@@ -1,9 +1,9 @@
-#include <soclblas/ops/GemmOutPlaceNaive.hpp>
+#include <vublas/ops/GemmOutPlaceNaive.hpp>
 #include <GemmOutPlaceNaiveFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     GemmOutPlaceNaiveFP32::GemmOutPlaceNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
         uint32_t subgroup_tile_p,

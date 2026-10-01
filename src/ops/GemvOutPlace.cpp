@@ -1,9 +1,9 @@
-#include "soclblas/ops/GemvArguments.hpp"
-#include <soclblas/ops/GemvOutPlace.hpp>
-#include <soclblas/ops/GemmOutPlace.hpp>
+#include "vublas/ops/GemvArguments.hpp"
+#include <vublas/ops/GemvOutPlace.hpp>
+#include <vublas/ops/GemmOutPlace.hpp>
 
-namespace soclblas{
-    GemvOutPlace::GemvOutPlace(socl::Context&):gemm(nullptr){}
+namespace vublas{
+    GemvOutPlace::GemvOutPlace(vucol::Context&):gemm(nullptr){}
     DispatchPlan GemvOutPlace::execute(
         std::span<const BufferView> inputs,
         std::span<const BufferView> inouts,

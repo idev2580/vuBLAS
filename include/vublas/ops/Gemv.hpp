@@ -1,15 +1,15 @@
 #pragma once
-#include "soclblas/ops/Operator.hpp"
-#include "soclblas/ops/Gemm.hpp"
-#include <soclblas/ops/GemvArguments.hpp>
+#include "vublas/ops/Operator.hpp"
+#include "vublas/ops/Gemm.hpp"
+#include <vublas/ops/GemvArguments.hpp>
 #include <cstdint>
 #include <memory>
 
-namespace soclblas{
+namespace vublas{
     class Gemv: public Operator{
         protected:
         std::unique_ptr<Gemm> gemm;
-        explicit Gemv(socl::Context& ctx);
+        explicit Gemv(vucol::Context& ctx);
 
         public:
         virtual DispatchPlan execute(

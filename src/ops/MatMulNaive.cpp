@@ -1,9 +1,9 @@
-#include <soclblas/ops/MatMulNaive.hpp>
+#include <vublas/ops/MatMulNaive.hpp>
 #include <MatMulNaiveFP32_SPIRV>
 
-namespace soclblas{
+namespace vublas{
     MatMulNaiveFP32::MatMulNaiveFP32(
-        socl::Context& ctx,
+        vucol::Context& ctx,
         uint32_t subgroup_tile_m,
         uint32_t subgroup_tile_n,
         uint32_t subgroup_tile_p,

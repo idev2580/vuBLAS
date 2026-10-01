@@ -1,6 +1,6 @@
-#include <soclblas/ops/GemmArguments.hpp>
+#include <vublas/ops/GemmArguments.hpp>
 
-namespace soclblas{
+namespace vublas{
     GemmOutPlaceArguments GemmOutPlaceArguments::sameOutputLayout(const GemmArguments& args){
         return {
             .b = args.b,

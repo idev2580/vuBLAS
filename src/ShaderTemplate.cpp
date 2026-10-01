@@ -1,9 +1,9 @@
 #include "ShaderTemplate.hpp"
-#include <socl/ShaderCompiler.hpp>
+#include <vucol/ShaderCompiler.hpp>
 #include <stdexcept>
 #include <string>
 
-namespace soclblas::detail{
+namespace vublas::detail{
     std::vector<uint32_t> compileShaderTemplate(
         std::string_view shaderTemplate,
         std::string_view injectedSource,
@@ -22,10 +22,10 @@ namespace soclblas::detail{
 
         std::string source(shaderTemplate);
         source.replace(markerOffset, marker.size(), injectedSource);
-        const socl::ShaderCompileOptions selected{
-            .vulkanVersion = socl::VulkanVersion::Vulkan13,
-            .spirvVersion = socl::SpirvVersion::Spirv16,
+        const vucol::ShaderCompileOptions selected{
+            .vulkanVersion = vucol::VulkanVersion::Vulkan13,
+            .spirvVersion = vucol::SpirvVersion::Spirv16,
         };
-        return socl::compileGlslToSpirv(source, selected, sourceName);
+        return vucol::compileGlslToSpirv(source, selected, sourceName);
     }
 }

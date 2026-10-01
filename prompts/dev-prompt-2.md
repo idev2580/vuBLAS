@@ -1,4 +1,5 @@
 # Development Prompt 2
+> **IMPORTANT:** Historical record from before the rename — `socl` is the former name of `vucol`, and `soclBLAS` is the former name of `vuBLAS` (same dependency, project, and library throughout).
 
 ## User Request
 Extend the naive GEMM approach with workgroup shared memory and add it as a new FP32 operator named `GemmSharedFP32`.

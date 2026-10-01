@@ -1,9 +1,9 @@
-#include "soclblas/ops/GemvArguments.hpp"
-#include <soclblas/ops/Gemv.hpp>
-#include <soclblas/ops/Gemm.hpp>
+#include "vublas/ops/GemvArguments.hpp"
+#include <vublas/ops/Gemv.hpp>
+#include <vublas/ops/Gemm.hpp>
 
-namespace soclblas{
-    Gemv::Gemv(socl::Context&):gemm(nullptr){}
+namespace vublas{
+    Gemv::Gemv(vucol::Context&):gemm(nullptr){}
     DispatchPlan Gemv::execute(
         std::span<const BufferView> inputs,
         std::span<const BufferView> inouts,
